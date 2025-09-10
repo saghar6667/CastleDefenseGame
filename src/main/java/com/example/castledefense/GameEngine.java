@@ -16,10 +16,10 @@ import java.util.Random;
 public class GameEngine extends Pane {
     private List<Point2D> enemyPath;
     private List<Point2D> buildZones;
-    private final List<Point2D> placeTowers = new ArrayList<>();
-    private final List<Enemy> enemies = new ArrayList<>();
-    private final List<Tower> towers = new ArrayList<>();
-    private final Castle castle = new Castle(new Point2D(600, 400), 100);
+    private final static List<Point2D> placeTowers = new ArrayList<>();
+    private final static List<Enemy> enemies = new ArrayList<>();
+    private final static List<Tower> towers = new ArrayList<>();
+    private final static Castle castle = new Castle(new Point2D(600, 400), 100);
     private int totalSpawned = 0;
     private int enemiesReachedEnd = 0;
     private boolean waveIsFinished = false;
