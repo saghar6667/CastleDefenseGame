@@ -27,7 +27,7 @@ public class GameMap extends Pane {
 
     public void loadBackground(String mapName) {
         String imagePath = switch (mapName) {
-            case "Forest" -> "/images/forest.png";
+            case "Forest" -> "/images/forest.jpg";
             case "Desert" -> "/images/desert.png";
             default -> "/images/default.png";
         };
