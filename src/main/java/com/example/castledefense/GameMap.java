@@ -15,13 +15,27 @@ import java.util.*;
 
 public class GameMap extends Pane {
     public static final int TILE_SIZE = 40;
-    private final GameEngine engine = new GameEngine(this);
+    private GameEngine engine;
     private Text castleHealthLabel;
 
-    public GameMap() {
+    public GameMap(String mapName) {
         setPrefSize(800, 600);
         createMap();
+        loadBackground(mapName);
 
+    }
+
+    public void loadBackground(String mapName) {
+        String imagePath = switch (mapName) {
+            case "Forest" -> "/images/forest.png";
+            case "Desert" -> "/images/desert.png";
+            default -> "/images/default.png";
+        };
+        Image background = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
+        ImageView bgView = new ImageView(background);
+        bgView.setFitWidth(800);
+        bgView.setFitHeight(600);
+        getChildren().add(bgView);
     }
 
     private void setUpHud() {
@@ -119,5 +133,11 @@ public class GameMap extends Pane {
                     zone.getX() * TILE_SIZE, zone.getY() * TILE_SIZE, engine, this);
             getChildren().add(spot);
         }
+    }
+
+
+
+    public void setEngine(GameEngine engine) {
+        this.engine = engine;
     }
 }

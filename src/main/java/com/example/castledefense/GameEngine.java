@@ -26,10 +26,24 @@ public class GameEngine extends Pane {
     private Timeline gameLoop;
     private GameMap map;
 
-    public GameEngine(GameMap map) {
+    public GameEngine(GameMap map, String mapName, String difficulty) {
         this.map = map;
-        initializePath();
+        this.enemyPath = loadPath(mapName);
         initializeBuildZones();
+    }
+
+    private List<Point2D> loadPath(String mapName) {
+        return switch (mapName) {
+            case "Forest" -> List.of(
+                    new Point2D(0, 0), new Point2D(3, 0),
+                    new Point2D(3, 4), new Point2D(7, 4));
+            case "Desert" -> List.of(
+                    new Point2D(0, 5), new Point2D(5, 5),
+                    new Point2D(5, 2), new Point2D(10, 2));
+            default -> List.of(
+                    new Point2D(0, 0), new Point2D(5, 0),
+                    new Point2D(4, 5), new Point2D(10, 5));
+        };
     }
 
     private void initializePath() {
