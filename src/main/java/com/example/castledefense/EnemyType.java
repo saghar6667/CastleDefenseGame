@@ -3,7 +3,8 @@ package com.example.castledefense;
 public enum EnemyType {
     NORMAL(100),
     FAST(60),
-    TANK(200);
+    TANK(200),
+    PLANE();
 
     private final int maxHealth;
 

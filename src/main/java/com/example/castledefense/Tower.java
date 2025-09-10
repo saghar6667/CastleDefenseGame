@@ -15,11 +15,7 @@ public abstract class Tower {
         this.y = y;
     }
 
-    public abstract void update(List<Enemy> enemies);
-
-    public void shoot(Enemy target) {
-        target.takeDamage(damage);
-    }
+    public abstract void update(List<Enemy> enemies, GameMap map, long currentTime);
 
     public double getX() {
         return x;
@@ -27,6 +23,10 @@ public abstract class Tower {
 
     public double getY() {
         return y;
+    }
+
+    public int getDamage() {
+        return damage;
     }
 
     public void takeDamage(int amount) {
@@ -72,4 +72,6 @@ public abstract class Tower {
     public double getRange() {
         return range;
     }
+
+
 }

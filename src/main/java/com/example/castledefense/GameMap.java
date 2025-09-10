@@ -18,8 +18,9 @@ public class GameMap extends Pane {
     private GameEngine engine;
     private Text castleHealthLabel;
 
-    public GameMap(String mapName) {
+    public GameMap(String mapName, GameEngine engine) {
         setPrefSize(800, 600);
+        this.engine = engine;
         createMap();
         loadBackground(mapName);
 
@@ -135,9 +136,4 @@ public class GameMap extends Pane {
         }
     }
 
-
-
-    public void setEngine(GameEngine engine) {
-        this.engine = engine;
-    }
 }

@@ -19,12 +19,12 @@ public class Enemy {
     private boolean isDead;
     private int damage;
 
-    public Enemy(List<Point2D> path, EnemyType type) {
+    public Enemy(List<Point2D> path, GameEngine engine) {
         this.path = path;
         Point2D start = path.getFirst();
         this.x = (start.getX() * TILE_SIZE) + ((double) TILE_SIZE / 2);
         this.y = (start.getY() * TILE_SIZE) + ((double) TILE_SIZE / 2);;
-        this.type = type;
+        this.type = engine.chooseRandomType();
         this.maxHealth = type.getMaxHealth();
         this.health = maxHealth;
         this.isDead = false;

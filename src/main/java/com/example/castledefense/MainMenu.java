@@ -3,7 +3,9 @@ package com.example.castledefense;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.image.Image;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -11,6 +13,7 @@ import javafx.stage.Stage;
 import javafx.scene.control.Button;
 
 import java.awt.*;
+import java.util.Objects;
 
 public class MainMenu extends VBox {
     private Stage stage;
@@ -22,19 +25,30 @@ public class MainMenu extends VBox {
         setSpacing(20);
         setAlignment(Pos.CENTER);
 
+        BackgroundImage bgImage = new BackgroundImage(
+                new Image(Objects.requireNonNull(getClass().
+                        getResource("/images/castle light.jpg")).toExternalForm()),
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundPosition.CENTER,
+                new BackgroundSize(800, 600, false, false, false, false)
+        );
+        setBackground(new Background(bgImage));
+
         Text title = new Text("Castle Defense");
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 36));
+        title.setFont(Font.font("Verdana", FontWeight.BOLD, 36));
+        title.setFill(Color.GOLD);
+        title.setStyle("-fx-effect: dropshadow(qaussian, black, 5, 0.5, 0, 2);");
         
         ComboBox<String> mapSelector = new ComboBox<>();
         mapSelector.getItems().addAll("Default", "Forest", "Desert");
         mapSelector.setValue("Default");
 
         ComboBox<String> difficultySelector = new ComboBox<>();
-        mapSelector.getItems().addAll("Easy", "Normal", "Hard");
+        difficultySelector.getItems().addAll("Easy", "Normal", "Hard");
         difficultySelector.setValue("Normal");
 
         Button newGameBtn = getGameBtn(stage, mapSelector, difficultySelector);
-
         getChildren().addAll(title, mapSelector, difficultySelector, newGameBtn);
     }
 
@@ -44,9 +58,9 @@ public class MainMenu extends VBox {
             selectedMap = mapSelector.getValue();
             selectedMap = difficultySelector.getValue();
 
-            GameMap map = new GameMap(selectedMap);
-            GameEngine engine = new GameEngine(map, selectedMap, selectedDifficulty);
-            map.setEngine(engine);
+            GameEngine engine = new GameEngine(selectedMap, selectedDifficulty);
+            GameMap map = new GameMap(selectedMap, engine);
+            engine.setMap(map);
             engine.startGame();
 
             Scene gameScene = new Scene(map, 800, 600);

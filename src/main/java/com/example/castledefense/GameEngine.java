@@ -3,6 +3,7 @@ package com.example.castledefense;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -12,6 +13,9 @@ import javafx.util.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class GameEngine extends Pane {
     private List<Point2D> enemyPath;
@@ -20,16 +24,40 @@ public class GameEngine extends Pane {
     private final static List<Enemy> enemies = new ArrayList<>();
     private final static List<Tower> towers = new ArrayList<>();
     private final static Castle castle = new Castle(new Point2D(600, 400), 100);
-    private int totalSpawned = 0;
+    private int totalSpawned = 0, enemyHealthMod;
     private int enemiesReachedEnd = 0;
     private boolean waveIsFinished = false;
     private Timeline gameLoop;
     private GameMap map;
+    private double towerCoolDownMod, spawnInterval;
+    private ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+    private boolean isPlacing = false;
+    private String placementType = " ";
 
-    public GameEngine(GameMap map, String mapName, String difficulty) {
-        this.map = map;
+    public GameEngine(String mapName, String difficulty) {
         this.enemyPath = loadPath(mapName);
         initializeBuildZones();
+
+        switch (difficulty) {
+            case "Easy" -> {
+                spawnInterval = 3.0;
+                enemyHealthMod = 1;
+                towerCoolDownMod = 0.8;
+            }
+            case "Normal" -> {
+                spawnInterval = 2.0;
+                enemyHealthMod = 2;
+                towerCoolDownMod = 1.0;
+            }
+            case "Hard" -> {
+                spawnInterval = 1.0;
+                enemyHealthMod = 3;
+                towerCoolDownMod = 1.2;}
+        }
+    }
+
+    public void setMap(GameMap map) {
+        this.map = map;
     }
 
     private List<Point2D> loadPath(String mapName) {
@@ -44,6 +72,34 @@ public class GameEngine extends Pane {
                     new Point2D(0, 0), new Point2D(5, 0),
                     new Point2D(4, 5), new Point2D(10, 5));
         };
+    }
+
+    public void enterPlacementMode(String type) {
+        isPlacing = true;
+        placementType = type;
+        map.showPlacementSpots(type);
+    }
+
+    public void placementClick(double x, double y) {
+        if (!isPlacing) {
+            return;
+        }
+
+        if (map.isValidPlacement(x, y, placementType)) {
+            switch (placementType) {
+                case "Fast Tower" -> {
+                    Tower tower = new FastShooterTower(x, y);
+                    towers.add(tower);
+                }
+                case "Heavy Tower" -> {
+                    Tower tower = new HeavyShooterTower(x, y);
+                }
+                case "Bomb" -> dropBombAt(x, y);
+            }
+            isPlacing = false;
+            placementType = "";
+            map.clearPlacementSpots();
+        }
     }
 
     private void initializePath() {
@@ -95,26 +151,41 @@ public class GameEngine extends Pane {
         return new ArrayList<>(towers);
     }
 
+    public void dropBombAt(double x, double y) {
+        for (Enemy enemy : enemies) {
+            if (Math.hypot(enemy.getX() - x, enemy.getY() - y) < 50) {
+                enemy.takeDamage(70);
+            }
+        }
+    }
+
     private void spawnEnemies() {
-        Timeline spawn = new Timeline(new KeyFrame(Duration.seconds(2), e -> {
-            EnemyType type = chooseRandomType();
-            Enemy enemy = new Enemy(enemyPath, type);
-            enemies.add(enemy);
-            totalSpawned++;
-        }));
-        spawn.setCycleCount(10);
-        spawn.setOnFinished(e -> waveIsFinished = true);
-        spawn.play();
+        executor.scheduleAtFixedRate(() -> {
+            Platform.runLater(() -> {
+                Enemy enemy = new Enemy(0, 300, 100, 1.5);
+                totalSpawned++;
+                enemies.add(enemy);
+            });
+        }, 0, (long) (spawnInterval * 1000), TimeUnit.MILLISECONDS);
     }
 
     public void startGameLoop() {
-        gameLoop = new Timeline(new KeyFrame(Duration.millis(30), e -> {
-            updateGame();
-        }));
-        gameLoop.setCycleCount(Animation.INDEFINITE);
-        gameLoop.play();
-    }
+        executor.scheduleAtFixedRate(() -> {
+            long currentTime = System.currentTimeMillis();
 
+            for (Enemy enemy : enemies) {
+                enemy.update();
+            }
+
+            for (Tower tower : towers) {
+                tower.update(enemies, map, currentTime);
+            }
+
+            Platform.runLater(() -> {
+                enemies.removeIf(Enemy::isDead);
+            });
+        }, 0, 50, TimeUnit.MILLISECONDS);
+    }
 
     private void drawMap() {
         Canvas canvas = new Canvas(800, 600);
@@ -145,40 +216,7 @@ public class GameEngine extends Pane {
         }
     }
 
-    private void redrawEnemies() {
-        getChildren().removeIf(node -> node instanceof EnemyView);
-        for (Enemy enemy : enemies) {
-            EnemyView view = new EnemyView(enemy);
-            getChildren().add(view);
-        }
-    }
-
-    private void updateGame() {
-        for (Enemy enemy : enemies) {
-            enemy.update();
-            if (enemy.hasReachedEnd()) {
-                castle.takeDamage(enemy.getDamage());
-            }
-        }
-
-        for(Tower tower: towers) {
-            tower.update(enemies);
-        }
-
-        enemies.removeIf(Enemy::isDead);
-        map.updateVisuals();
-
-        double breachRatio = (double) enemiesReachedEnd / totalSpawned;
-        if (breachRatio >= 0.2) {
-            map.showGameOver();
-            gameLoop.stop();
-        } else if (waveIsFinished && enemies.isEmpty()) {
-            map.showVictory();
-            gameLoop.stop();
-        }
-    }
-
-    private EnemyType chooseRandomType() {
+    public EnemyType chooseRandomType() {
         EnemyType[] types = EnemyType.values();
         return types[new Random().nextInt(types.length)];
     }

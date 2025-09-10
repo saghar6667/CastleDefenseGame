@@ -18,6 +18,8 @@ public class HeavyShooterTower extends Tower {
         if (getLastAttackTime() <= getCoolDown()) {
             for (Enemy enemy : enemies) {
                 if (isInRange(enemy)) {
+                    Projectile projectile = new Projectile(getX(), getY(), enemy);
+                    map.getChildren().add()
                     shoot(enemy);
                     setLastAttackTime(0);
                     break;
