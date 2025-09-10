@@ -1,121 +1,64 @@
 package com.example.castledefense;
 
-
 import javafx.geometry.Point2D;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
-
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import java.util.List;
 
 public class Enemy {
-    private double x, y;
-    private int pathIndex = 0;
-    private final List<Point2D> path;
-    private double speed;
-    private final EnemyType type;
-    private int health;
-    private int maxHealth;
-    private static final int TILE_SIZE = 40;
-    private boolean isDead;
-    private int damage;
+    protected double x, y;
+    protected int health;
+    protected double speed;
+    protected EnemyType type;
+    protected List<Point2D> path;
+    protected int currentTarget = 0;
+    protected ImageView view;
 
-    public Enemy(, GameEngine engine) {
+    public Enemy(double x, double y, int health, double speed, EnemyType type, List<Point2D> path) {
+        this.x = x;
+        this.y = y;
+        this.health = health;
+        this.speed = speed;
+        this.type = type;
         this.path = path;
-        Point2D start = path.getFirst();
-        this.x = (start.getX() * TILE_SIZE) + ((double) TILE_SIZE / 2);
-        this.y = (start.getY() * TILE_SIZE) + ((double) TILE_SIZE / 2);;
-        this.type = engine.chooseRandomType();
-        this.maxHealth = type.getMaxHealth();
-        this.health = maxHealth;
-        this.isDead = false;
-
-        switch (type) {
-            case NORMAL -> {
-                this.speed = 1.5;
-                this.damage = 10;
-            }
-            case FAST -> {
-                this.speed = 2.5;
-                this.damage = 8;
-            }
-            case TANK -> {
-                this.speed = 0.8;
-                this.damage = 20;
-            }
-        }
+        this.view = new ImageView(new Image("/images/enemies/enemy_ground.png"));
+        view.setFitWidth(48);
+        view.setFitHeight(48);
+        view.setX(x);
+        view.setY(y);
     }
 
     public void update() {
-        if (pathIndex >= path.size()) {
-            return;
-        }
+        if (currentTarget >= path.size()) return;
+        Point2D target = path.get(currentTarget);
+        double dx = target.getX() - x;
+        double dy = target.getY() - y;
+        double dist = Math.hypot(dx, dy);
 
-        Point2D target = path.get(pathIndex);
-        double targetX = (target.getX() * TILE_SIZE) + ((double) TILE_SIZE / 2);
-        double targetY = (target.getY() * TILE_SIZE) + ((double) TILE_SIZE / 2);
-
-        double dx = targetX - x;
-        double dy = targetY - y;
-        double distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance < speed) {
-            x = targetX;
-            y = targetY;
-            pathIndex++;
+        if (dist < speed) {
+            x = target.getX();
+            y = target.getY();
+            currentTarget++;
         } else {
-            x += (dx / distance) * speed;
-            y += (dy / distance) * speed;
+            x += speed * dx / dist;
+            y += speed * dy / dist;
         }
+
+        view.setX(x);
+        view.setY(y);
     }
 
-    public void draw(GraphicsContext gc) {
-        switch (type) {
-            case NORMAL -> gc.setFill(Color.CRIMSON);
-            case FAST -> gc.setFill(Color.ORANGE);
-            case TANK -> gc.setFill(Color.LIGHTGREEN);
-        }
-        gc.fillOval(x - 10, y -10, 20, 20);
+    public boolean reachedCastle() {
+        return currentTarget >= path.size();
     }
 
-    public boolean hasReachedEnd() {
-        return pathIndex >= path.size() - 1;
+    public void takeDamage(int dmg) {
+        health -= dmg;
     }
 
-    public EnemyType getType() {
-        return type;
-    }
-
-    public double getX() {
-        return x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public int getHealth() {
-        return health;
-    }
-
-    public int getMaxHealth() {
-        return maxHealth;
-    }
-
-    public int getDamage() {
-        return damage;
-    }
-
-    public void takeDamage(int amount) {
-        health -= amount;
-
-        if (health <= 0) {
-            health = 0;
-            isDead = true;
-        }
-    }
-
-    public boolean isDead() {
-        return isDead;
-    }
-
+    public boolean isDead() { return health <= 0; }
+    public ImageView getView() { return view; }
+    public EnemyType getType() { return type; }
+    public double getX() { return x; }
+    public double getY() { return y; }
 }

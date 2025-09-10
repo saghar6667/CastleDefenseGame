@@ -38,6 +38,7 @@ public class MainMenu extends VBox {
         Text title = new Text("Castle Defense");
         title.setFont(Font.font("Verdana", FontWeight.BOLD, 36));
         title.setFill(Color.GOLD);
+        title.setStroke(Color.BLACK);
         title.setStyle("-fx-effect: dropshadow(qaussian, black, 5, 0.5, 0, 2);");
         
         ComboBox<String> mapSelector = new ComboBox<>();
@@ -56,7 +57,7 @@ public class MainMenu extends VBox {
         Button newGameBtn = new Button("New Game");
         newGameBtn.setOnAction(e -> {
             selectedMap = mapSelector.getValue();
-            selectedMap = difficultySelector.getValue();
+            selectedDifficulty = difficultySelector.getValue();
 
             GameEngine engine = new GameEngine(selectedMap, selectedDifficulty);
             GameMap map = new GameMap(selectedMap, engine);

@@ -5,15 +5,15 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.util.List;
 
-public class HeavyShooterTower extends Tower {
+public class AntiAircraftTower extends Tower {
 
-    public HeavyShooterTower(double x, double y) {
+    public AntiAircraftTower(double x, double y) {
         super(x, y);
-        this.cooldown = 2000;
-        this.damage = 40;
-        this.health = 150;
-        this.range = 180;
-        this.view = new ImageView(new Image("/images/towers/tower_heavy.png"));
+        this.cooldown = 1000;
+        this.damage = 30;
+        this.health = 100;
+        this.range = 200;
+        this.view = new ImageView(new Image("/images/towers/tower_aa.png"));
         view.setFitWidth(48);
         view.setFitHeight(48);
         view.setX(x);
@@ -24,10 +24,10 @@ public class HeavyShooterTower extends Tower {
     public void update(List<Enemy> enemies, GameMap map, long currentTime) {
         if (currentTime - lastAttackTime < cooldown || health <= 0) return;
 
-        for (Enemy enemy : enemies) {
-            if (enemy.getType() != EnemyType.AIR && isInRange(enemy)) {
+        for (Enemy e : enemies) {
+            if (e.getType() == EnemyType.AIR && isInRange(e)) {
                 Platform.runLater(() -> {
-                    Projectile p = new Projectile(x, y, enemy);
+                    Projectile p = new Projectile(x, y, e);
                     map.getChildren().add(p);
                     p.launch(map, damage);
                 });

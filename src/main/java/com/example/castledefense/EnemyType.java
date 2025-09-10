@@ -4,7 +4,7 @@ public enum EnemyType {
     NORMAL(100),
     FAST(60),
     TANK(200),
-    PLANE();
+    AIR(100);
 
     private final int maxHealth;
 
