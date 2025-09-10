@@ -175,6 +175,9 @@ public class GameEngine extends Pane {
 
             for (Enemy enemy : enemies) {
                 enemy.update();
+                if (enemy.hasReachedEnd()) {
+                    enemiesReachedEnd++;
+                }
             }
 
             for (Tower tower : towers) {
@@ -182,7 +185,17 @@ public class GameEngine extends Pane {
             }
 
             Platform.runLater(() -> {
-                enemies.removeIf(Enemy::isDead);
+                double breachRatio = totalSpawned == 0 ? 0 : (double) enemiesReachedEnd / totalSpawned;
+                if (breachRatio >= 0.1) {
+                    map.showGameOver();
+                    executor.shutdown();
+                } else if (enemies.isEmpty() && breachRatio < 0.1 && totalSpawned > 0) {
+                    map.showVictory();
+                    executor.shutdown();
+                } else {
+                    enemies.removeIf(Enemy::isDead);
+                    map.updateVisuals();
+                }
             });
         }, 0, 50, TimeUnit.MILLISECONDS);
     }

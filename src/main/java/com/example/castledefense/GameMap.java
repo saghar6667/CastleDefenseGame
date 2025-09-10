@@ -3,6 +3,7 @@ package com.example.castledefense;
 import javafx.geometry.Point2D;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -17,6 +18,7 @@ public class GameMap extends Pane {
     public static final int TILE_SIZE = 40;
     private GameEngine engine;
     private Text castleHealthLabel;
+    private List<Circle> placementSpots = new ArrayList<>();
 
     public GameMap(String mapName, GameEngine engine) {
         setPrefSize(800, 600);
@@ -69,8 +71,8 @@ public class GameMap extends Pane {
     }
 
     public void showGameOver() {
-        Text gameOver = new Text("Game Over!");
-        gameOver.setFont(Font.font("Arial", FontWeight.BOLD, 48));
+        Text gameOver = new Text("GAME OVER");
+        gameOver.setFont(Font.font("Verdana", FontWeight.BOLD, 48));
         gameOver.setFill(Color.RED);
         gameOver.setX(200);
         gameOver.setY(300);
@@ -78,12 +80,38 @@ public class GameMap extends Pane {
     }
 
     public void showVictory() {
-        Text victory = new Text("You Won!");
-        victory.setFont(Font.font("Arial", FontWeight.BOLD, 48));
+        Text victory = new Text("VICTORY");
+        victory.setFont(Font.font("Verdana", FontWeight.BOLD, 48));
         victory.setFill(Color.DARKBLUE);
         victory.setX(200);
         victory.setY(300);
         getChildren().add(victory);
+    }
+
+    public void showPlacementSpots(String type) {
+        placementSpots.clear();
+        for (int i = 100; i < 700; i += 100) {
+            Circle circle = new Circle(i, 500, 15, Color.LIGHTBLUE);
+            circle.setOpacity(0.6);
+            placementSpots.add(circle);
+            getChildren().add(circle);
+        }
+    }
+
+    public void clearPlacementSpots() {
+        for (Circle circle : placementSpots) {
+            getChildren().remove(circle);
+        }
+        placementSpots.clear();
+    }
+
+    public boolean isValidPlacement(double x, double y, String type) {
+        for (Circle circle : placementSpots) {
+            if (Math.hypot(circle.getCenterX() - x, circle.getCenterY() - y) < 20) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void generateTiles() {

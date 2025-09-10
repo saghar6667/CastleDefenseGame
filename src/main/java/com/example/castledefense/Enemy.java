@@ -19,7 +19,7 @@ public class Enemy {
     private boolean isDead;
     private int damage;
 
-    public Enemy(List<Point2D> path, GameEngine engine) {
+    public Enemy(, GameEngine engine) {
         this.path = path;
         Point2D start = path.getFirst();
         this.x = (start.getX() * TILE_SIZE) + ((double) TILE_SIZE / 2);

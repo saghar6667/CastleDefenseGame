@@ -13,7 +13,7 @@ public class HeavyShooterTower extends Tower {
     }
 
     @Override
-    public void update(List<Enemy> enemies) {
+    public void update(List<Enemy> enemies, GameMap map, long currentTime) {
         setLastAttackTime(getLastAttackTime() + 0.016);
         if (getLastAttackTime() <= getCoolDown()) {
             for (Enemy enemy : enemies) {

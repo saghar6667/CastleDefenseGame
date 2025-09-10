@@ -3,7 +3,6 @@ package com.example.castledefense;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-
 import javafx.geometry.Point2D;
 
 public class TowerSpot extends StackPane {
