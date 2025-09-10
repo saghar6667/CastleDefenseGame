@@ -1,6 +1,8 @@
 package com.example.castledefense;
 
 import javafx.geometry.Point2D;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -42,12 +44,36 @@ public class GameMap extends Pane {
     }
 
     private void setUpHud() {
-        castleHealthLabel = new Text("Castle Health: " + engine.getCastle().getHealth());
+        Label castleHealthLabel = new Label("Castle HP: 100" + engine.getCastle().getHealth());
         castleHealthLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
-        castleHealthLabel.setFill(Color.BLANCHEDALMOND);
-        castleHealthLabel.setX(20);
-        castleHealthLabel.setY(30);
-        getChildren().add(castleHealthLabel);
+        castleHealthLabel.setTextFill(Color.BLANCHEDALMOND);
+        castleHealthLabel.setLayoutX(20);
+        castleHealthLabel.setLayoutY(20);
+        castleHealthLabel.setId("hpLabel");
+
+        Label waveLabel = new Label("Wave: 1");
+        waveLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+        waveLabel.setTextFill(Color.WHITE);
+        waveLabel.setLayoutX(20);
+        waveLabel.setLayoutY(50);
+        waveLabel.setId("waveLabel");
+
+        Button supplyBtn = new Button("Supply Menu");
+        supplyBtn.setLayoutX(650);
+        supplyBtn.setLayoutY(20);
+        supplyBtn.setOnAction(e -> {
+            SupplyMenu menu = new SupplyMenu(engine);
+            getChildren().add(menu);
+        });
+
+        Label breachLabel = new Label("Breached: 0");
+        breachLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+        breachLabel.setTextFill(Color.ORANGE);
+        breachLabel.setLayoutX(20);
+        breachLabel.setLayoutY(80);
+        breachLabel.setId("breachLabel");
+
+        getChildren().addAll(waveLabel, supplyBtn, breachLabel, castleHealthLabel);
     }
 
     public void updateVisuals() {
@@ -61,7 +87,9 @@ public class GameMap extends Pane {
             getChildren().add(new TowerView(tower));
         }
 
-        castleHealthLabel.setText("Castle Health: " + engine.getCastle().getHealth());
+        ((Label) lookup("#hpLabel")).setText("Castle HP: " + engine.getCastle().getHealth());
+        ((Label) lookup("#waveLabel")).setText("Wave: " + engine.getWave());
+        ((Label) lookup("#breachedLabel")).setText("Breached: " + engine.getEnemiesReached());
     }
 
     private void createMap() {

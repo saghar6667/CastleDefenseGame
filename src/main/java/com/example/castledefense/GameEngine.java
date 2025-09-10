@@ -26,7 +26,7 @@ public class GameEngine extends Pane {
     private final static Castle castle = new Castle(new Point2D(600, 400), 100);
     private int totalSpawned = 0, enemyHealthMod;
     private int enemiesReachedEnd = 0;
-    private boolean waveIsFinished = false;
+    private int wave = 1;
     private Timeline gameLoop;
     private GameMap map;
     private double towerCoolDownMod, spawnInterval;
@@ -54,6 +54,14 @@ public class GameEngine extends Pane {
                 enemyHealthMod = 3;
                 towerCoolDownMod = 1.2;}
         }
+    }
+
+    public int getWave() {
+        return wave;
+    }
+
+    public int getEnemiesReached() {
+        return enemiesReachedEnd;
     }
 
     public void setMap(GameMap map) {
